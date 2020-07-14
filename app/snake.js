@@ -1,4 +1,14 @@
-// Colors
+/*Comments
+// * * oo
+// ?
+// *!
+//TODO: 
+//// nooo
+*/
+
+
+
+// * Colors
 var gray = 51;
 var white = 255;
 var black = 0;
@@ -6,7 +16,7 @@ var yellow = [255, 255, 0];
 var violet = [238, 130, 238];
 var board = [];
 
-// Enviromnent variables
+//* Enviromnent variables
 var sizeWindowX = 600;
 var sizeWindowY = 600;
 var frame_rate = 10;
@@ -14,7 +24,7 @@ var size = 15;
 
 const pop_total = 250;
 
-//Snake class
+//* Class for handle snake
 class Blocks {
     _pos_x = -1;
     _pos_y = -1;
@@ -46,7 +56,7 @@ class Snake {
     _yspeed = 0;
     _speed = 1;
     _total = 0;
-    _movements = 100;
+    _moves = 100;
 
     constructor() {
         this._head = new Blocks(floor(sizeWindowX / 2), floor(sizeWindowY / 2));
@@ -54,7 +64,7 @@ class Snake {
         this._yspeed = -this._speed;
         this._xspeed = 0;
         this._total = 0;
-        this._movements = 100;
+        this._moves = 100;
     }
 
     get head() {
@@ -104,17 +114,29 @@ class Snake {
         this._total = value;
     }
 
-    get movements() {
-        return this._movements;
+    get moves() {
+        return this._moves;
     }
-    set movements(value) {
-        this._movements = value;
+    set moves(value) {
+        this._moves = value;
     }
 
+
+    //* Function to set a new Start on the snake ( Reseting values )
+    newStart() { //! Deprecated for this project
+        //console.log("New Start!")
+        this._head = new Blocks(floor(sizeWindowX / 2), floor(sizeWindowY / 2));
+        this._body = [];
+        this._yspeed = -this._speed;
+        this._xspeed = 0;
+        this._total = 0;
+        this._movements = 100;
+    }
+
+    //* Snake Movement functions
     movement() {
         this.bodyMovement();
         this.headMovement();
-        //this.status();
     }
 
     headMovement() {
@@ -123,7 +145,7 @@ class Snake {
         head.pos_x += this.xspeed * size;
         head.pos_y += this.yspeed * size;
 
-        this.movements -= 1;
+        this.moves -= 1;
         // head.pos_x = constrain(head.pos_x, 0, sizeWindowX - size);
         // head.pos_y = constrain(head.pos_y, 0, sizeWindowY - size);
     }
@@ -135,9 +157,14 @@ class Snake {
         this.body[this.body.length - 1] = new Blocks(this.head.pos_x, this.head.pos_y);
     }
 
+    //TODO: Ends here (Snake Movement functions)
+
+
+    //* Function that handle eat
     eat() {
         this.total += 1;
         this.addTail();
+        this.moves += floor(sizeWindowX / 2 + sizeWindowY / 2);
     }
 
     addTail() {
@@ -147,30 +174,7 @@ class Snake {
         this.body.push(new Blocks(pos_x, pos_y));
     }
 
-    newStart() {
-        //console.log("New Start!")
-        this._head = new Blocks(floor(sizeWindowX / 2), floor(sizeWindowY / 2));
-        this._body = [];
-        this._yspeed = -this._speed;
-        this._xspeed = 0;
-        this._total = 0;
-        this._movements = 100;
-    }
-
-    status() {
-
-        if (this.checkColision()) {
-            // console.log("You colide with something!");
-            this.newStart();
-        }
-
-        if (this.movements <= 0) {
-            //console.log("Without movements");
-            this.newStart();
-        }
-
-    }
-
+    //* Check if the snake colide with herself or with the wall; returns true if it colides 
     checkColision() {
         var head = this.head;
 
@@ -194,6 +198,7 @@ class Snake {
 
 }
 
+//* Class that handles all the simulation
 class Board {
     _snake = null;
     _food = null;
@@ -241,6 +246,7 @@ class Board {
         return new Blocks(x, y);
     }
 
+    //* Iteration functions
     update() {
         this.snackMovement();
     }
@@ -257,6 +263,9 @@ class Board {
         }
     }
 
+    //TODO: End of iteration functions
+
+    //* Function that handles colisions
     checkColisionBetweenTwoBlocks(block1, block2) {
         var d = dist(block1.pos_x, block1.pos_y, block2.pos_x, block2.pos_y);
         if (d < size / 2 + 5) {
@@ -266,6 +275,16 @@ class Board {
         }
     }
 
+    status(){ // Function that give the status of the snake
+        if(this.statusColision()){
+            return true;
+        }else if(this.snake.moves <= 0){
+            return true;
+        }
+
+        return false;
+    }
+
     statusColision() {
         if (this.snake.checkColision()) {
             return true;
@@ -273,6 +292,7 @@ class Board {
         return false;
     }
 
+    //* Functions to give values to the AI
     checkColisionWall(pos_x, pos_y) {
         if (pos_x > sizeWindowX || pos_x < 0) {
             return true;
@@ -287,6 +307,7 @@ class Board {
         return false;
     }
 
+    //* Function that returns an array of the speed of snake ( To pass the error of null values for the AI )
     arraySnakeSpeed() {
         let snake_xspeed = 0;
         let snake_yspeed = 0;
@@ -309,6 +330,8 @@ class Board {
         return array;
     }
 
+
+    //* Functions that give the position ahead, on the right and the left of the current location of the snake
     leftSideCoordArray() {
         let array = [];
         let x = 0;
@@ -390,16 +413,18 @@ class Board {
         return array;
     }
 
+    //* Movement snake AI
     think() {
         let fw_pos = this.fowardSideCoordArray();
         let r_pos = this.rightSideCoordArray();
         let l_pos = this.leftSideCoordArray();
 
         let inputs = [];
+        //! Needs to put more inputs, total, and colision with food and colision with herself
         inputs[0] = this.checkColisionWall(fw_pos[0], fw_pos[1]);
         inputs[1] = this.checkColisionWall(r_pos[0], r_pos[1]);
         inputs[2] = this.checkColisionWall(l_pos[0], l_pos[1]);
-        inputs[3] = this.snake.movements;
+        inputs[3] = this.snake.moves;
 
         let output = this.brain.predict(inputs);
         if (output[0] > output[1] && output[0] > output[2]) { // Foward~
@@ -410,30 +435,6 @@ class Board {
             this.aiLeft();
         }
 
-    }
-
-    drawSnake() {
-        stroke(255);
-        fill(violet);
-        let head = this.snake.head;
-        rect(head.pos_x, head.pos_y, size, size);
-
-        fill(white);
-        let body = this.snake.body;
-        for (let i = 0; i < body.length; i++) {
-            rect(body[i].pos_x, body[i].pos_y, size, size);
-        }
-    }
-
-    drawFood() {
-        fill(yellow);
-        rect(this.food.pos_x, this.food.pos_y, size, size);
-    }
-
-    show() {
-
-        this.drawSnake();
-        this.drawFood();
     }
 
     aiRight() {
@@ -483,7 +484,29 @@ class Board {
         }
     }
 
+    //* Drawing functions
+    show() {
+        this.drawSnake();
+        this.drawFood();
+    }
 
+    drawSnake() {
+        stroke(255);
+        fill(violet);
+        let head = this.snake.head;
+        rect(head.pos_x, head.pos_y, size, size);
+
+        fill(white);
+        let body = this.snake.body;
+        for (let i = 0; i < body.length; i++) {
+            rect(body[i].pos_x, body[i].pos_y, size, size);
+        }
+    }
+
+    drawFood() {
+        fill(yellow);
+        rect(this.food.pos_x, this.food.pos_y, size, size);
+    }
 }
 
 //Draw functions
@@ -492,7 +515,6 @@ function setup() {
     for (let i = 0; i < pop_total; i++) {
         board[i] = new Board();
     }
-
 
     background(gray);
     frameRate(frame_rate);
@@ -504,12 +526,20 @@ function draw() {
     for (let brd of board) {
         brd.think();
         brd.update();
-        if (brd.statusColision()) {
+        //console.log("Snake " + i + " : " + brd.snake.moves);
+
+        // Delete snakes that are "Dead"
+        if (brd.status()) {
             board.splice(i, 1);
         }
+
         i += 1;
+
         brd.show();
     }
-    console.log(i);
+
+    if(board.length === 0){
+        nextGeneration();
+    }
 
 }
