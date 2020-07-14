@@ -4,7 +4,7 @@ var white = 255;
 var black = 0;
 var yellow = [255, 255, 0];
 var violet = [238, 130, 238];
-var board = null
+var board = [];
 
 // Enviromnent variables
 var sizeWindowX = 600;
@@ -12,6 +12,7 @@ var sizeWindowY = 600;
 var frame_rate = 10;
 var size = 15;
 
+const pop_total = 250;
 
 //Snake class
 class Blocks {
@@ -36,8 +37,6 @@ class Blocks {
     set pos_y(value) {
         this._pos_y = value;
     }
-
-
 }
 
 class Snake {
@@ -115,7 +114,7 @@ class Snake {
     movement() {
         this.bodyMovement();
         this.headMovement();
-        this.status();
+        //this.status();
     }
 
     headMovement() {
@@ -148,8 +147,8 @@ class Snake {
         this.body.push(new Blocks(pos_x, pos_y));
     }
 
-    newStart(){
-        console.log("New Start!")
+    newStart() {
+        //console.log("New Start!")
         this._head = new Blocks(floor(sizeWindowX / 2), floor(sizeWindowY / 2));
         this._body = [];
         this._yspeed = -this._speed;
@@ -161,12 +160,12 @@ class Snake {
     status() {
 
         if (this.checkColision()) {
-            console.log("You colide with something!");
+            // console.log("You colide with something!");
             this.newStart();
         }
 
-        if(this.movements <= 0){
-            console.log("Without movements");
+        if (this.movements <= 0) {
+            //console.log("Without movements");
             this.newStart();
         }
 
@@ -225,10 +224,10 @@ class Board {
     get brain() {
         return this._brain;
     }
+
     set brain(value) {
         this._brain = value;
     }
-
 
     getRandom(min, max) {
         return Math.random() * (max - min) + min;
@@ -240,6 +239,10 @@ class Board {
         let x = floor(this.getRandom(1, cols - 1) * size);
         let y = floor(this.getRandom(1, rows - 1) * size);
         return new Blocks(x, y);
+    }
+
+    update() {
+        this.snackMovement();
     }
 
     snackMovement() {
@@ -263,9 +266,11 @@ class Board {
         }
     }
 
-    update() {
-        this.think();
-        this.snackMovement();
+    statusColision() {
+        if (this.snake.checkColision()) {
+            return true;
+        }
+        return false;
     }
 
     checkColisionWall(pos_x, pos_y) {
@@ -278,12 +283,8 @@ class Board {
         }
     }
 
-    checkColisionApple(pos_x, pos_y) {
-
-    }
-
-    checkColisionSnake(pos_x, pos_y) {
-
+    checkColisionBodySnake(pos_x, pos_y) {
+        return false;
     }
 
     arraySnakeSpeed() {
@@ -307,7 +308,6 @@ class Board {
         array.push(snake_yspeed);
         return array;
     }
-
 
     leftSideCoordArray() {
         let array = [];
@@ -402,20 +402,18 @@ class Board {
         inputs[3] = this.snake.movements;
 
         let output = this.brain.predict(inputs);
-       // console.log(output);
-        if (output[0] > 0.5) { // Foward
-           // console.log("entrei");
-        } else if (output[1] > 0.5) { //Right
-          //  console.log("entrei2");
+        if (output[0] > output[1] && output[0] > output[2]) { // Foward~
+            //Does nothing
+        } else if (output[1] > output[0] && output[1] > output[2]) { //Right
             this.aiRight();
-        } else if (output[2] > 0.5) { //Left
-          //  console.log("entre3");
+        } else if (output[2] > output[0] && output[2] > output[1]) { //Left
             this.aiLeft();
         }
 
     }
 
     drawSnake() {
+        stroke(255);
         fill(violet);
         let head = this.snake.head;
         rect(head.pos_x, head.pos_y, size, size);
@@ -433,6 +431,7 @@ class Board {
     }
 
     show() {
+
         this.drawSnake();
         this.drawFood();
     }
@@ -450,7 +449,7 @@ class Board {
         }
 
         if (this.snake.yspeed > 0) { //Down
-            this.snake.xspeed = this.snake.speed;
+            this.snake.xspeed = - this.snake.speed;
             this.snake.yspeed = 0;
             return;
         } else if (this.snake.yspeed < 0) { // Up
@@ -464,7 +463,7 @@ class Board {
     aiLeft() {
         //Going*
         if (this.snake.xspeed > 0) { // Right
-            this.snake.yspeed = -this.snake.speed;
+            this.snake.yspeed = - this.snake.speed;
             this.snake.xspeed = 0;
             return;
         } else if (this.snake.xspeed < 0) { //Left
@@ -474,78 +473,43 @@ class Board {
         }
 
         if (this.snake.yspeed > 0) { //Down
-            this.snake.xspeed = -this.snake.speed;
+            this.snake.xspeed = this.snake.speed;
             this.snake.yspeed = 0;
             return;
         } else if (this.snake.yspeed < 0) { // Up
-            this.snake.xspeed = this.snake.speed;
+            this.snake.xspeed = - this.snake.speed;
             this.snake.yspeed = 0;
             return;
         }
     }
 
-    /*
-     up() {
-         if (this.snake.xspeed != 0) {
-             this.snake.xspeed = 0;
-             this.snake.yspeed = - this.snake.speed;
-         }
-     }
- 
-     left() {
-         if (this.snake.yspeed != 0) {
-             this.snake.xspeed = - this.snake.speed;
-             this.snake.yspeed = 0;
-         }
- 
-     }
- 
-     down() {
-         if (this.snake.xspeed != 0) {
-             this.snake.xspeed = 0;
-             this.snake.yspeed = this.snake.speed;
-         }
-     }
- 
-     right() {
-         if (this.snake.yspeed != 0) {
-             this.snake.xspeed = this.snake.speed;
-             this.snake.yspeed = 0;
-         }
-     }
-     */
-
 
 }
 
-
-
 //Draw functions
 function setup() {
-    board = new Board();
     createCanvas(sizeWindowX, sizeWindowY);
+    for (let i = 0; i < pop_total; i++) {
+        board[i] = new Board();
+    }
+
+
     background(gray);
     frameRate(frame_rate);
-
 }
 
 function draw() {
     background(gray);
-    board.update();
-    board.show();
-
-}
-
-/*
-function keyPressed() {
-    if (keyCode === LEFT_ARROW) {
-        board.left();
-    } else if (keyCode === RIGHT_ARROW) {
-        board.right();
-    } else if (keyCode === UP_ARROW) {
-        board.up();
-    } else if (keyCode === DOWN_ARROW) {
-        board.down();
+    let i = 0;
+    for (let brd of board) {
+        brd.think();
+        brd.update();
+        if (brd.statusColision()) {
+            board.splice(i, 1);
+        }
+        i += 1;
+        brd.show();
     }
+    console.log(i);
+
 }
-*/
