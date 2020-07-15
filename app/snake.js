@@ -18,24 +18,19 @@ var saveBoards = [];
 
 //* Enviromnent variables
 var frame_rate = 10;
-var size = 50;
-const pop_total = 1;
+
+const pop_total = 30;
 var spaceBetween = 1;
 
-var sizeCanvasX = 500;
-var sizeCanvasY = 500;
+var n_per_row = 8;
 
-var sizeWindowX = 500;
-var sizeWindowY = 500;
+var sizeWindowX = 200;
+var sizeWindowY = 200;
 
+var sizeCanvasX = n_per_row * sizeWindowX;
+var sizeCanvasY = (pop_total / n_per_row + 0.5) * sizeWindowY;
 
-/** 
-var sizeCanvasX = 1200;
-var sizeCanvasY = 800;
-
-var sizeWindowX = sizeCanvasX / Math.sqrt(pop_total);
-var sizeWindowY = sizeCanvasY / Math.sqrt(pop_total); 
-*/
+var size = ((sizeWindowX + sizeWindowY) / 2) / 10;
 
 
 //* Class for handle snake
@@ -183,7 +178,6 @@ class Snake {
 
     //TODO: Ends here (Snake Movement functions)
 
-
     //* Function that handle eat
     eat() {
         this.score += 1;
@@ -226,7 +220,6 @@ class Snake {
 
         return false;
     }
-
 
 }
 
@@ -307,7 +300,7 @@ class Board {
     //* Iteration functions
     update() {
         this.snackMovement();
-       // this.think();
+        this.think();
     }
 
     snackMovement() {
@@ -642,6 +635,7 @@ function draw() {
         for (let i = boards.length - 1; i >= 0; i--) {
             // Delete snakes that are "Dead" and saves it (for another array)
             if (boards[i].snake.checkColision()) {
+                console.log("dead");
                 //saveBoards.push(boards.splice(i, 1)[0]);
             }
         }
@@ -656,13 +650,16 @@ function draw() {
     //Drawing
     let aux_x = spaceBetween;
     let aux_y = spaceBetween;
+    let contador = 0;
     background(gainsboro);
     for (let board of boards) {
+        contador += 1;
         board.show(aux_x, aux_y);
         aux_x += (sizeWindowX + spaceBetween);
-        if (aux_x >= sizeCanvasX || sizeCanvasX / aux_x < 1) {
+        if (contador >= n_per_row) {
             aux_x = spaceBetween;
             aux_y += (sizeWindowY + spaceBetween);
+            contador = 0;
         }
     }
 
