@@ -2,7 +2,7 @@
 
 //* Populates again the AI
 function nextGeneration() {
-    console.log("New Generation");
+    generation += 1;
     calculateFitness();
 
     for (let i = 0; i < pop_total; i++) {
@@ -35,8 +35,7 @@ function calculateFitness() { //* Calculate Quality of the solution
     let sum = 0;
     for (let board of saveBoards) {
         sum += board.snake.score;
-    }
-    
+    }    
 
     for (let board of saveBoards) {
         board.snake.fitness = board.snake.score / sum;

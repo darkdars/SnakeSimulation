@@ -69,7 +69,7 @@ class NeuralNetwork {
     output.map(this.activation_function.func);
 
     // Sending back to the caller!
-  
+
     return output.toArray();
   }
 
@@ -165,8 +165,8 @@ class NeuralNetwork {
   mutate(rate) {
     function mutate(val) {
       if (Math.random() < rate) {
-        // return 2 * Math.random() - 1;
-        return val + randomGaussian(0, 0.1);
+        return 2 * Math.random() - 1;
+        //return val + randomGaussian(0, 0.1);
       } else {
         return val;
       }
@@ -178,5 +178,6 @@ class NeuralNetwork {
   }
 
 
+  
 
 }

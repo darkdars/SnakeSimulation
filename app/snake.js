@@ -8,7 +8,7 @@
 
 // * Colors
 var gray = 51;
-var gainsboro = [211,211,211];
+var gainsboro = [211, 211, 211];
 var white = 255;
 var black = 0;
 var yellow = [255, 255, 0];
@@ -16,16 +16,18 @@ var violet = [238, 130, 238];
 var boards = [];
 var saveBoards = [];
 
+var generation = 0;
+
 //* Enviromnent variables
 var frame_rate = 10;
 
-const pop_total = 24;
+const pop_total = 250;
 var spaceBetween = 1;
 
-var n_per_row = 6;
+var n_per_row = 20;
 
-var sizeWindowX = 200;
-var sizeWindowY = 200;
+var sizeWindowX = 100;
+var sizeWindowY = 100;
 
 var sizeCanvasX = n_per_row * sizeWindowX;
 var sizeCanvasY = (pop_total / n_per_row + 0.5) * sizeWindowY;
@@ -159,19 +161,19 @@ class Snake {
     }
 
 
-    headMovement(){
+    headMovement() {
         let head = this.head;
 
         head.pos_x += this.xspeed * size;
         head.pos_y += this.yspeed * size;
     }
 
-    bodyMovement(){
-        if(this.body.length > 0){
+    bodyMovement() {
+        if (this.body.length > 0) {
             for (let i = 0; i < this.body.length - 1; i++) {
                 this.body[i] = this.body[i + 1];
             }
-    
+
             this.body[this.body.length - 1] = new Blocks(this.head.pos_x, this.head.pos_y);
         }
     }
@@ -195,11 +197,10 @@ class Snake {
 
         if (head.pos_x < 0 || head.pos_x >= sizeWindowX ||
             head.pos_y < 0 || head.pos_y >= sizeWindowY) {
-                console.log(head);
             return true;
         }
 
-        if(this.body.length > 1){
+        if (this.body.length > 1) {
             for (let i = 0; i < this.body.length - 1; i++) {
                 let pos = this.body[i];
                 let d = dist(head.pos_x, head.pos_y, pos.pos_x, pos.pos_y);
@@ -212,10 +213,10 @@ class Snake {
         return false;
     }
 
-    status(){
-        if(this.checkColision()){
+    status() {
+        if (this.checkColision()) {
             return true;
-        }else if(this.moves <= 0){
+        } else if (this.moves <= 0) {
             return true;
         }
 
@@ -232,14 +233,14 @@ class Board {
     _buffer = null;
 
     constructor(brain) {
-        this._snake =  this.newSnake();
+        this._snake = this.newSnake();
         this._food = this.randomFood();
         this._buffer = createGraphics(sizeWindowX, sizeWindowY);
 
         if (brain) {
             this.brain = brain.copy();
         } else {
-            this._brain = new NeuralNetwork(9, 30, 3);
+            this._brain = new NeuralNetwork(10, 30, 3);
         }
     }
 
@@ -278,15 +279,15 @@ class Board {
         return Math.random() * (max - min) + min;
     }
 
-    newRandomSnake(){
+    newRandomSnake() {
         var cols = floor(sizeWindowX / size);
         var rows = floor(sizeWindowY / size);
         let x = floor(this.getRandom(1, cols - 1) * size);
         let y = floor(this.getRandom(1, rows - 1) * size);
         return new Snake(x, y);
     }
-    
-    newSnake(){
+
+    newSnake() {
         let x = floor(1 * size);
         let y = floor(1 * size);
         return new Snake(x, y);
@@ -342,17 +343,17 @@ class Board {
     checkColisionBodySnake(pos_x, pos_y) { // Returns true if it colides with herself
         var body = this.snake.body;
 
-        if(body.length > 1){
+        if (body.length > 1) {
             for (var i = 0; i < body.length - 1; i++) {
                 var pos = body[i];
                 var d = dist(pos_x, pos_y, pos.pos_x, pos.pos_y);
-    
+
                 if (d < 1) {
                     return true;
                 }
             }
         }
-        
+
 
         return false;
     }
@@ -364,6 +365,10 @@ class Board {
         }
 
         return false;
+    }
+
+    distSnakeFromFood(){
+        return dist(this.snake.head.pos_x, this.snake.head.pos_y, this.food.pos_x, this.food.pos_y);
     }
 
     //* Function that returns an array of the speed of snake ( To pass the error of null values for the AI )
@@ -473,7 +478,7 @@ class Board {
 
     //* AI mutate function
     mutate() {
-        this.brain.mutate(0.1); // Mutate 10 %
+        this.brain.mutate(0.3); // Mutate 30 %
     }
 
     //* Movement snake AI 
@@ -492,6 +497,7 @@ class Board {
         inputs[6] = this.checkColisionFood(fw_pos[0], fw_pos[1]);
         inputs[7] = this.checkColisionFood(l_pos[0], l_pos[1]);
         inputs[8] = this.checkColisionFood(r_pos[0], r_pos[1]);
+        inputs[9] = this.distSnakeFromFood();
 
         //* Distance from the food?! In the 9 directions
 
@@ -600,7 +606,7 @@ function setup() {
 
 function draw() {
 
-    for (let j = 0; j < slider.value(); j++) {       
+    for (let j = 0; j < slider.value(); j++) {
         for (let board of boards) {
             board.update();
         }
@@ -618,7 +624,9 @@ function draw() {
 
     }
 
-    
+
+
+
     //Drawing
     let aux_x = spaceBetween;
     let aux_y = spaceBetween;
