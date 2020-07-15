@@ -6,7 +6,7 @@ function nextGeneration() {
     calculateFitness();
 
     for (let i = 0; i < pop_total; i++) {
-        board[i] = pickOne();
+        boards[i] = pickOne();
     }
     
     saveBoards = [];
@@ -33,13 +33,13 @@ function pickOne() {
 
 function calculateFitness() { //* Calculate Quality of the solution
     let sum = 0;
-    for (let brd of saveBoards) {
-        sum += brd.snake.score;
+    for (let board of saveBoards) {
+        sum += board.snake.score;
     }
     
 
-    for (let brd of saveBoards) {
-        brd.snake.fitness = brd.snake.score / sum;
+    for (let board of saveBoards) {
+        board.snake.fitness = board.snake.score / sum;
     }
 
 }

@@ -597,15 +597,14 @@ function setup() {
 
 function draw() {
 
-    for (let j = 0; j < slider.value(); j++) { 
-        console.log("doing");       
+    for (let j = 0; j < slider.value(); j++) {       
         for (let board of boards) {
             board.update();
         }
 
         for (let i = boards.length - 1; i >= 0; i--) {
             // Delete snakes that are "Dead" and saves it (for another array)
-            if (boards[i].snake.checkColision()) {
+            if (boards[i].snake.status()) {
                 saveBoards.push(boards.splice(i, 1)[0]);
             }
         }
