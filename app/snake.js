@@ -19,10 +19,10 @@ var saveBoards = [];
 //* Enviromnent variables
 var frame_rate = 10;
 
-const pop_total = 30;
+const pop_total = 24;
 var spaceBetween = 1;
 
-var n_per_row = 8;
+var n_per_row = 6;
 
 var sizeWindowX = 200;
 var sizeWindowY = 200;
@@ -193,8 +193,9 @@ class Snake {
     checkColision() {
         let head = this.head;
 
-        if (head.pos_x < 0 || head.pos_x > sizeWindowX ||
-            head.pos_y < 0 || head.pos_y > sizeWindowY) {
+        if (head.pos_x < 0 || head.pos_x >= sizeWindowX ||
+            head.pos_y < 0 || head.pos_y >= sizeWindowY) {
+                console.log(head);
             return true;
         }
 
@@ -286,7 +287,9 @@ class Board {
     }
     
     newSnake(){
-        return new Snake(0, sizeWindowX / 2);
+        let x = floor(1 * size);
+        let y = floor(1 * size);
+        return new Snake(x, y);
     }
 
     randomFood() {
@@ -329,7 +332,7 @@ class Board {
 
     //* Functions to give values to the AI
     checkColisionWall(pos_x, pos_y) { // Returnss true if it colides with the wall
-        if (pos_x > sizeWindowX || pos_x < 0 || pos_y > sizeWindowY || pos_y < 0) {
+        if (pos_x >= sizeWindowX || pos_x < 0 || pos_y >= sizeWindowY || pos_y < 0) {
             return true;
         } else {
             return false;
@@ -489,8 +492,8 @@ class Board {
         inputs[6] = this.checkColisionFood(fw_pos[0], fw_pos[1]);
         inputs[7] = this.checkColisionFood(l_pos[0], l_pos[1]);
         inputs[8] = this.checkColisionFood(r_pos[0], r_pos[1]);
-        //inputs[9] = this.snake.score;
-        //inputs[10] = this.snake.moves;
+
+        //* Distance from the food?! In the 9 directions
 
         let output = this.brain.predict(inputs);
         if (output[0] > output[1] && output[0] > output[2]) { // Foward

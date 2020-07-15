@@ -23,8 +23,8 @@ function pickOne() {
     }
     index--;
 
-    let brd = saveBoards[index];
-    let child = new Board(brd.brain);
+    let board = saveBoards[index];
+    let child = new Board(board.brain);
     child.mutate();
 
     return child;
