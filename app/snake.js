@@ -578,36 +578,6 @@ class Board {
         this.buffer.rect(this.food.pos_x, this.food.pos_y, size, size);
     }
 
-
-    up() {
-        if (this.snake.xspeed != 0) {
-            this.snake.xspeed = 0;
-            this.snake.yspeed = - this.snake.speed;
-        }
-    }
-
-    left() {
-        if (this.snake.yspeed != 0) {
-            this.snake.xspeed = - this.snake.speed;
-            this.snake.yspeed = 0;
-        }
-
-    }
-
-    down() {
-        if (this.snake.xspeed != 0) {
-            this.snake.xspeed = 0;
-            this.snake.yspeed = this.snake.speed;
-        }
-    }
-
-    right() {
-        if (this.snake.yspeed != 0) {
-            this.snake.xspeed = this.snake.speed;
-            this.snake.yspeed = 0;
-        }
-    }
-
 }
 
 let slider;
@@ -627,7 +597,8 @@ function setup() {
 
 function draw() {
 
-    for (let j = 0; j < slider.value(); j++) {        
+    for (let j = 0; j < slider.value(); j++) { 
+        console.log("doing");       
         for (let board of boards) {
             board.update();
         }
@@ -662,17 +633,4 @@ function draw() {
         }
     }
 
-}
-
-
-function keyPressed() {
-    if (keyCode === LEFT_ARROW) {
-        boards[0].left();
-    } else if (keyCode === RIGHT_ARROW) {
-        boards[0].right();
-    } else if (keyCode === UP_ARROW) {
-        boards[0].up();
-    } else if (keyCode === DOWN_ARROW) {
-        boards[0].down();
-    }
 }
