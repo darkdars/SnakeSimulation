@@ -635,8 +635,7 @@ function draw() {
         for (let i = boards.length - 1; i >= 0; i--) {
             // Delete snakes that are "Dead" and saves it (for another array)
             if (boards[i].snake.checkColision()) {
-                console.log("dead");
-                //saveBoards.push(boards.splice(i, 1)[0]);
+                saveBoards.push(boards.splice(i, 1)[0]);
             }
         }
 
