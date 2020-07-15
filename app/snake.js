@@ -8,6 +8,7 @@
 
 // * Colors
 var gray = 51;
+var gainsboro = [211,211,211];
 var white = 255;
 var black = 0;
 var yellow = [255, 255, 0];
@@ -16,15 +17,18 @@ var board = [];
 var saveBoards = [];
 
 //* Enviromnent variables
-var sizeWindowX = 300;
-var sizeWindowY = 300;
 var frame_rate = 10;
-var size = 10;
+var size = 100;
+const pop_total = 1;
+var spaceBetween = 1;
 
-var sizeCanvas = 800;
-var sizeCanvas = 800;
+var sizeCanvasX = 800;
+var sizeCanvasY = 800;
 
-const pop_total = 500;
+var sizeWindowX = Math.floor(sizeCanvasY / Math.sqrt(pop_total));
+var sizeWindowY = Math.floor(sizeCanvasX / Math.sqrt(pop_total));
+
+
 
 //* Class for handle snake
 class Blocks {
@@ -201,10 +205,12 @@ class Board {
     _snake = null;
     _food = null;
     _brain = null;
+    _buffer = null;
 
     constructor(brain) {
         this._snake = new Snake();
         this._food = this.randomFood();
+        this._buffer = createGraphics(sizeWindowX, sizeWindowY);
 
         if (brain) {
             this.brain = brain.copy();
@@ -235,6 +241,13 @@ class Board {
 
     set brain(value) {
         this._brain = value;
+    }
+
+    get buffer() {
+        return this._buffer;
+    }
+    set buffer(value) {
+        this._buffer = value;
     }
 
     getRandom(min, max) {
@@ -518,27 +531,30 @@ class Board {
     }
 
     //* Drawing functions
-    show() {
-        this.drawSnake();
-        this.drawFood();
+    show(x, y) {
+        this.buffer.background(gray);
+        this.drawSnake(x, y);
+        this.drawFood(x, y);
+
+        image(this.buffer, x, y);
     }
 
     drawSnake() {
-        stroke(255);
-        fill(violet);
+        this.buffer.stroke(255);
+        this.buffer.fill(violet);
         let head = this.snake.head;
-        rect(head.pos_x, head.pos_y, size, size);
+        this.buffer.rect(head.pos_x, head.pos_y, size, size);
 
-        fill(white);
+        this.buffer.fill(white);
         let body = this.snake.body;
         for (let i = 0; i < body.length; i++) {
-            rect(body[i].pos_x, body[i].pos_y, size, size);
+            this.buffer.rect(body[i].pos_x, body[i].pos_y, size, size);
         }
     }
 
     drawFood() {
-        fill(yellow);
-        rect(this.food.pos_x, this.food.pos_y, size, size);
+        this.buffer.fill(yellow);
+        this.buffer.rect(this.food.pos_x, this.food.pos_y, size, size);
     }
 }
 
@@ -546,14 +562,14 @@ let slider;
 
 //Draw functions
 function setup() {
-    createCanvas(sizeWindowX, sizeWindowY);
     slider = createSlider(1, 100, 1);
+
+    createCanvas(sizeCanvasX + 20, sizeCanvasY + 20);
     for (let i = 0; i < pop_total; i++) {
         board[i] = new Board();
-
     }
 
-    background(gray);
+    background(gainsboro);
     frameRate(frame_rate);
 }
 
@@ -580,11 +596,18 @@ function draw() {
 
     }
 
+    var aux_x = spaceBetween;
+    var aux_y = spaceBetween;
 
     //Drawing
-    background(gray);
+    background(gainsboro);
     for (let brd of board) {
-        brd.show();
+        brd.show(aux_x, aux_y);
+        aux_x += (sizeWindowX + spaceBetween);
+        if (aux_x >= sizeCanvasX || sizeCanvasX / aux_x < 1) {
+            aux_x = spaceBetween;
+            aux_y += (sizeWindowY + spaceBetween);
+        }
     }
 
 }
