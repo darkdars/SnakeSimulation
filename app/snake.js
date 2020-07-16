@@ -21,7 +21,7 @@ var generation = 0;
 //* Enviromnent variables
 var frame_rate = 10;
 
-const pop_total = 250;
+const pop_total = 10;
 var spaceBetween = 1;
 
 var n_per_row = 20;
@@ -587,6 +587,11 @@ class Board {
         this.buffer.rect(this.food.pos_x, this.food.pos_y, size, size);
     }
 
+    //* Dispose data
+    dispose(){
+        this.brain.dispose();
+    }
+
 }
 
 let slider;
@@ -594,7 +599,7 @@ let slider;
 //Draw functions
 function setup() {
     slider = createSlider(1, 100, 1);
-
+    //tf.setBackend('cpu');
     createCanvas(sizeCanvasX + 10, sizeCanvasY + 10);
     for (let i = 0; i < pop_total; i++) {
         boards[i] = new Board();

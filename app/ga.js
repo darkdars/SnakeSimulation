@@ -9,8 +9,11 @@ function nextGeneration() {
         boards[i] = pickOne();
     }
     
+    for(let i = 0; i < pop_total; i++){
+        saveBoards[i].dispose();
+    }
+
     saveBoards = [];
-    
 }
 
 function pickOne() {
