@@ -16,54 +16,54 @@ class NeuralNetwork {
     }
 
     createModel() { //Create neural network with JS
-            const model = tf.sequential();
-            const hidden = tf.layers.dense({
-                units: this.hidden_nodes,
-                inputShape: [this.input_nodes],
-                activation: 'sigmoid',// How the data is processed
-            });
-            model.add(hidden);
-            const output = tf.layers.dense(
-                {
-                    units: this.output_nodes,
-                    activation: 'softmax'
+        const model = tf.sequential();
+        const hidden = tf.layers.dense({
+            units: this.hidden_nodes,
+            inputShape: [this.input_nodes],
+            activation: 'sigmoid',// How the data is processed
+        });
+        model.add(hidden);
+        const output = tf.layers.dense(
+            {
+                units: this.output_nodes,
+                activation: 'softmax'
 
-                }
-            );
+            }
+        );
 
-            model.add(output);
-            return model;
-        
+        model.add(output);
+        return model;
+
     }
 
 
     mutate(rate) {
         // Go thought all weight's and mutate them (Give a random value to them, Rate% chance of changing the weight value)
+        tf.tidy(() => {
+            const weights = this.model.getWeights();
+            const mutatedWeights = [];
 
-        const weights = this.model.getWeights();
-        const mutatedWeights = [];
-
-        for (let i = 0; i < weights.length; i++) {
-            let tensor = weights[i];
-            let shape = weights[i].shape;
-            let values = tensor.dataSync().slice();
-            for (let j = 0; j < values.length; j++) {
-                if (random(1) < rate) {
-                    let w = values[j];
-                    values[j] = w + randomGaussian();
+            for (let i = 0; i < weights.length; i++) {
+                let tensor = weights[i];
+                let shape = weights[i].shape;
+                let values = tensor.dataSync().slice();
+                for (let j = 0; j < values.length; j++) {
+                    if (random(1) < rate) {
+                        let w = values[j];
+                        values[j] = w + randomGaussian();
+                    }
                 }
+
+                let newTensor = tf.tensor(values, shape);
+                mutatedWeights[i] = newTensor;
             }
 
-            let newTensor = tf.tensor(values, shape);
-            mutatedWeights[i] = newTensor;
-
-        }
-
-        this.model.setWeights(mutatedWeights);
+            this.model.setWeights(mutatedWeights);
+        });
     }
 
 
-    dispose(){
+    dispose() {
         this.model.dispose();
     }
 
