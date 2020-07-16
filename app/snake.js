@@ -21,18 +21,19 @@ var generation = 0;
 //* Enviromnent variables
 var frame_rate = 10;
 
-const pop_total = 10;
+const pop_total = 50;
 var spaceBetween = 1;
 
-var n_per_row = 20;
+var n_per_row = 15;
 
-var sizeWindowX = 100;
-var sizeWindowY = 100;
+var sizeWindowX = 50;
+var sizeWindowY = 50;
 
 var sizeCanvasX = n_per_row * sizeWindowX;
 var sizeCanvasY = (pop_total / n_per_row + 0.5) * sizeWindowY;
 
-var size = ((sizeWindowX + sizeWindowY) / 2) / 10;
+var size = ((sizeWindowX + sizeWindowY) / 2) / 5;
+var reward = 10;
 
 
 //* Class for handle snake
@@ -67,7 +68,7 @@ class Snake {
     _yspeed = 0;
     _speed = 1;
     _score = 0;
-    _moves = 100;
+    _moves = 0;
     _fitness = 0;
     _time_alive = 0;
 
@@ -78,7 +79,7 @@ class Snake {
         this._xspeed = this._speed;
         this._score = 0;
         this._time_alive = 0;
-        this._moves = 100;
+        this._moves = ((sizeWindowX + sizeWindowY) / size);
         this._fitness = 0;
     }
 
@@ -183,7 +184,7 @@ class Snake {
     //* Function that handle eat
     eat() {
         this.score += 1;
-        this.moves += 100;
+        this.moves += reward;
         this.addTail();
     }
 
@@ -240,7 +241,7 @@ class Board {
         if (brain) {
             this.brain = brain.copy();
         } else {
-            this._brain = new NeuralNetwork(10, 30, 3);
+            this._brain = new NeuralNetwork(10, 20, 3);
         }
     }
 
@@ -367,8 +368,12 @@ class Board {
         return false;
     }
 
+    angleToFood(){
+
+    }
+    
     distSnakeFromFood(){
-        return dist(this.snake.head.pos_x, this.snake.head.pos_y, this.food.pos_x, this.food.pos_y);
+        return dist(this.snake.head.pos_x, this.snake.head.pos_y, this.food.pos_x, this.food.pos_y) / size;
     }
 
     //* Function that returns an array of the speed of snake ( To pass the error of null values for the AI )
@@ -477,8 +482,8 @@ class Board {
     }
 
     //* AI mutate function
-    mutate() {
-        this.brain.mutate(0.3); // Mutate 30 %
+    mutate(rate) {
+        this.brain.mutate(rate);
     }
 
     //* Movement snake AI 
@@ -495,9 +500,10 @@ class Board {
         inputs[4] = this.checkColisionBodySnake(r_pos[0], r_pos[1]);
         inputs[5] = this.checkColisionBodySnake(l_pos[0], l_pos[1]);
         inputs[6] = this.checkColisionFood(fw_pos[0], fw_pos[1]);
-        inputs[7] = this.checkColisionFood(l_pos[0], l_pos[1]);
-        inputs[8] = this.checkColisionFood(r_pos[0], r_pos[1]);
+        inputs[7] = this.checkColisionFood(r_pos[0], r_pos[1]);
+        inputs[8] = this.checkColisionFood(l_pos[0], l_pos[1]);
         inputs[9] = this.distSnakeFromFood();
+        //Away from the food (0) going through the food (1)
 
         //* Distance from the food?! In the 9 directions
 
@@ -599,7 +605,7 @@ let slider;
 //Draw functions
 function setup() {
     slider = createSlider(1, 100, 1);
-    //tf.setBackend('cpu');
+    tf.setBackend('cpu');
     createCanvas(sizeCanvasX + 10, sizeCanvasY + 10);
     for (let i = 0; i < pop_total; i++) {
         boards[i] = new Board();
@@ -628,9 +634,6 @@ function draw() {
         }
 
     }
-
-
-
 
     //Drawing
     let aux_x = spaceBetween;

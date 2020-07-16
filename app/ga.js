@@ -5,8 +5,12 @@ function nextGeneration() {
     generation += 1;
     calculateFitness();
 
-    for (let i = 0; i < pop_total; i++) {
+    for (let i = pop_total / 2; i < pop_total; i++) {
         boards[i] = pickOne();
+    }
+
+    for(let i = 0; i < pop_total / 2; i++){
+        boards[i] = pickMax();
     }
     
     for(let i = 0; i < pop_total; i++){
@@ -28,11 +32,25 @@ function pickOne() {
 
     let board = saveBoards[index];
     let child = new Board(board.brain);
-    child.mutate();
+    child.mutate(0.2);
 
     return child;
 }
 
+function pickMax(){
+    let max = 0;
+    let aux;
+    for (let board of saveBoards){
+        if(board.snake.score > max){
+            max = board.snake.score;
+            aux = board.brain;
+        }
+    }
+
+    let child = new Board(aux);
+    child.mutate(0.1);
+    return child;
+}
 
 function calculateFitness() { //* Calculate Quality of the solution
     let sum = 0;

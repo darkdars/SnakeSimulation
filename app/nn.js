@@ -68,8 +68,7 @@ class NeuralNetwork {
     }
 
     predict(inputs) {
-
-        //TODO: Tensor flow online recives "Tensors", resuming it's stored on Memory RAM
+        //TODO: Tensor flow online recives "Tensors", resuming it's stored on Memory RAM (It's in format of Matrix)
         return tf.tidy(() => { //Cleaning the data
             const xs = tf.tensor2d([inputs]);
             const ys = this.model.predict(xs);
